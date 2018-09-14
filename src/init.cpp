@@ -1706,7 +1706,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
     if (mapArgs.count("-blocknotify"))
         uiInterface.NotifyBlockTip.connect(BlockNotifyCallback);
 
-    uiInterface.InitMessage(_("Activating best chain..."));
+    uiInterface.InitMessage(_("Activating best chain...Please wait, it may take a while... That might occur due to improper shutdown."));
     // scan for better chains in the block chain database, that are not yet connected in the active best chain
     CValidationState state;
     if (!ActivateBestChain(state))
@@ -1735,7 +1735,6 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
     }
 
     if (fMasterNode) {
-        LogPrintf("MASTERNODE:\n");
 
         if (!GetArg("-masternodeaddr", "").empty()) {
             // Hot masternode (either local or remote) should get its address in

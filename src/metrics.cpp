@@ -174,20 +174,28 @@ void ConnectMetricsScreen()
 int printStats(bool mining)
 {
     // Number of lines that are always displayed
-    int lines = 4;
+    int lines = 5;
 
     int height;
+    int bestHeader;
+    float downloadPercent;
     size_t connections;
     int64_t netsolps;
-    {
+    const CChainParams& chainparams = Params();
+    const int nLastAirdroppedBlock = chainparams.ForkStartHeight() + chainparams.ForkHeightRange();
+
+    {   
+        bestHeader = (pindexBestHeader ? pindexBestHeader->nHeight : -1);
         LOCK2(cs_main, cs_vNodes);
         height = chainActive.Height();
+        downloadPercent = ((float)height/(float)bestHeader) * 100.00;
         connections = vNodes.size();
         netsolps = GetNetworkHashPS(120, -1);
     }
     auto localsolps = GetLocalSolPS();
-
-    std::cout << "           " << _("Block height") << " | " << height << std::endl;
+    
+    std::cout << "           " << _("Block height") << " | " << height << " ("<< std::fixed << std::setprecision(2) << downloadPercent << "\%)" <<std::endl;
+    std::cout << "            " << _("Best header") << " | " << bestHeader << std::endl;
     std::cout << "            " << _("Connections") << " | " << connections << std::endl;
     std::cout << "  " << _("Network solution rate") << " | " << netsolps << " Sol/s" << std::endl;
     if (mining && miningTimer.running()) {
@@ -195,6 +203,15 @@ int printStats(bool mining)
         lines++;
     }
     std::cout << std::endl;
+    if(height <= nLastAirdroppedBlock){
+        std::cout << std::endl;
+        std::cout << "  " << _("Note: BTC and ZCL airdrop blocks are being downloaded.") << std::endl;
+        std::cout << "  " << _("      These take longer to sync than normal blocks.") << std::endl;
+        std::cout << "  " << _("      Please be patient. Aftewards, sync speed and performance will return to normal.") << std::endl;
+        std::cout << std::endl;
+        lines += 5;
+        
+    }
 
     return lines;
 }

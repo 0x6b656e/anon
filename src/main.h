@@ -125,9 +125,9 @@ static const unsigned int AVG_ADDRESS_BROADCAST_INTERVAL = 30;
 /** Average delay between trickled inventory broadcasts in seconds.
  *  Blocks, whitelisted receivers, and a random 25% of transactions bypass this. */
 static const unsigned int AVG_INVENTORY_BROADCAST_INTERVAL = 5;
-/** Block download timeout base, expressed in millionths of the block interval (i.e. 2.5 min) */
+/** Block download timeout base, expressed in millionths of the block interval (i.e. 10 min) */
 static const int64_t BLOCK_DOWNLOAD_TIMEOUT_BASE = 1000000;
-/** Additional block download timeout per parallel downloading peer (i.e. 1.25 min) */
+/** Additional block download timeout per parallel downloading peer (i.e. 5 min) */
 static const int64_t BLOCK_DOWNLOAD_TIMEOUT_PER_PEER = 500000;
 
 static const unsigned int DEFAULT_LIMITFREERELAY = 15;
@@ -325,7 +325,6 @@ void FlushStateToDisk();
 void PruneAndFlush();
 
 /** (try to) add transaction to memory pool **/
-// bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState& state, const CTransaction& tx, bool fLimitFree, bool* pfMissingInputs, bool fOverrideMempoolLimit = false, bool fRejectAbsurdFee = false);
 bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState &state, const CTransaction &tx, bool fLimitFree,
                         bool* pfMissingInputs, bool fRejectAbsurdFee=false);
 
@@ -861,7 +860,7 @@ bool CheckBlock(const CBlock& block, CValidationState& state,
                 bool fCheckPOW = true, bool fCheckMerkleRoot = true, bool isZUTXO = false);
 
 /** Context-dependent validity checks */
-bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationState& state, CBlockIndex* pindexPrev);
+bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationState& state, CBlockIndex* pindexPrev, bool isZUTXO);
 bool ContextualCheckBlock(const CBlock& block, CValidationState& state, CBlockIndex* pindexPrev);
 
 /** Check a block is completely valid from start to finish (only works on top of our current best block, with cs_main held) */
@@ -984,7 +983,7 @@ bool CheckTxInputs(const CTransaction& tx, CValidationState& state, const CCoins
 }
 
 #ifdef FORK_CB_INPUT
-#define FORK_COINBASE_PER_BLOCK 50000
+#define FORK_COINBASE_PER_BLOCK 10000
 
 extern std::string forkUtxoPath;
 extern int64_t forkStartHeight;
@@ -995,35 +994,6 @@ extern uint256 forkExtraHashSentinel;
 //std::string GetUTXOFileName(int nHeight);
 std::string GetUTXOFileName(int nHeight, bool isZUTXO = false);
 
-//ex: forkStartHeight = 300 000; forkHeightRange = 65K
-//A. for miner:
-//   1.   Current height = 299 999; the next block to create 300 000
-//                  nHeight is 300 000 - return false
-//   2.   Current height = 300 000; the next block to create 300 001
-//                  nHeight is 300 001 - return true - file to use utxo-00001.bin
-//      ...
-//
-//   n-1. Current height = 364 999; the next block to create 365 000
-//                  nHeight is 365 000 - return true - file to use utxo-65000.bin
-//   n.   Current height = 365 000; the next block to create 365 001
-//                  nHeight is 365 001 - return false
-//
-//  fork blocks 300001 - 365000
-//
-//B. for acceptblock:
-//   1.   Current height = 299 999
-//                  nHeight is 299 999 - return false - no verification
-//   2.   Current height = 300 000
-//                  nHeight is 300 000 - return false - no verification
-//   3.   Current height = 300 001
-//                  nHeight is 300 001 - return true - verify with file utxo-00001.bin
-//      ...
-//
-//   n.   Current height = 365 000
-//                  nHeight is 365 000 - return true - verify with file utxo-65000.bin
-//   n+1. Current height = 365 001
-//                  nHeight is 365 001 - return false - no verification
-//
 inline bool isForkBlock(int nHeight)
 {   
     return (nHeight > forkStartHeight && nHeight <= forkStartHeight + forkHeightRange);
@@ -1032,6 +1002,13 @@ inline bool isForkBlock(int nHeight)
 inline bool looksLikeForkBlockHeader(const CBlockHeader& header)
 {
     return header.hashReserved == forkExtraHashSentinel;
+}
+
+inline bool isForkBlockHeader(const CBlockHeader& header)
+{
+    return header.GetHash() != Params().GenesisBlock().GetHash() &&
+        header.hashReserved == forkExtraHashSentinel &&
+        looksLikeForkBlockHeader(header);
 }
 
 inline uint64_t bytes2uint64(char* array)

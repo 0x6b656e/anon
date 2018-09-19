@@ -92,7 +92,7 @@ UniValue getalldata(const UniValue& params, bool fHelp)
             }
         }
          //get all z address
-        std::set<libsnowgem::PaymentAddress> addresses;
+        std::set<libzcashf::PaymentAddress> addresses;
         pwalletMain->GetPaymentAddresses(addresses);
         for (auto addr : addresses ) {
             if (pwalletMain->HaveSpendingKey(addr)) {

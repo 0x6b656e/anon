@@ -60,6 +60,8 @@ UniValue getalldata(const UniValue& params, bool fHelp)
     returnObj.push_back(Pair("privatebalance", FormatMoney(nPrivateBalance)));
     returnObj.push_back(Pair("totalbalance", FormatMoney(nTotalBalance)));
     returnObj.push_back(Pair("unconfirmedbalance", FormatMoney(pwalletMain->GetUnconfirmedBalance())));
+    returnObj.push_back(Pair("immaturebalance", FormatMoney(pwalletMain->GetImmatureBalance())));
+	
      //get address balance
     nBalance = 0;
      //get all t address

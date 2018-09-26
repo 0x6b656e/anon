@@ -3025,6 +3025,45 @@ CAmount getBalanceTaddr(std::string transparentAddress, int minDepth, bool ignor
     return balance;
 }
 
+CAmount getMasternodesCollateral(std::string transparentAddress, int minDepth=1) {
+    set<CBitcoinAddress> setAddress;
+    vector<COutput> vecOutputs;
+    CAmount balance = 0;
+
+    if (transparentAddress.length() > 0) {
+        CBitcoinAddress taddr = CBitcoinAddress(transparentAddress);
+        if (!taddr.IsValid()) {
+            throw std::runtime_error("Invalid transparent address");
+        }
+        setAddress.insert(taddr);
+    }
+
+    LOCK2(cs_main, pwalletMain->cs_wallet);
+
+    pwalletMain->AvailableCoins(vecOutputs, true, NULL, false, false, ONLY_500, true);
+
+    BOOST_FOREACH(const COutput& out, vecOutputs) {
+        if (out.nDepth < minDepth) {
+            continue;
+        }
+
+        if (setAddress.size()) {
+            CTxDestination address;
+            if (!ExtractDestination(out.tx->vout[out.i].scriptPubKey, address)) {
+                continue;
+            }
+
+            if (!setAddress.count(address)) {
+                continue;
+            }
+        }
+
+        CAmount nValue = out.tx->vout[out.i].nValue;
+        balance += nValue;
+    }
+    return balance;
+}
+
 CAmount getBalanceZaddr(std::string address, int minDepth, bool ignoreUnspendable) {
     CAmount balance = 0;
     std::vector<CNotePlaintextEntry> entries;

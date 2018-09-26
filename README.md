@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.com/ByeBugDevelopment/anon-backup.svg?token=WBBgtRXJbdCRsjxqqhJy&branch=master)](https://travis-ci.com/ByeBugDevelopment/anon-backup)
 
-**Anonymous Bitcoin v1.0.0**
+**Anonymous Bitcoin v.1.2.0**
 
 ANON is an implementation of the zerocash protocol, bootstrapped with a merge of the Official Bitcoin and Zclassic UTXO sets via a snapshot and airdrop, and with the additional implementation of masternodes.
 
@@ -43,6 +43,8 @@ connection, the synchronization process could take a day or more once the
 blockchain has reached a significant size.
 
 It includes both `anond` (the daemon) and `anon-cli` (the command line tools).
+
+**To [DOWNLOAD](https://github.com/anonymousbitcoin/anon/releases) pre-built binaries, visit [RELEASES](https://github.com/anonymousbitcoin/anon/releases).**
 
 ## Build
 
@@ -154,6 +156,10 @@ Note that in WSL, the Anon source code must be somewhere in the default mount fi
 4. Build for Windows
 
 ```{r, engine='bash'}
+# Checkout
+git clone https://github.com/anonymousbitcoin/anon.git
+cd anon
+
 PATH=$(echo "$PATH" | sed -e 's/:\/mnt.*//g') # strip out problematic Windows %PATH% imported var
 ./anonutil/build-win.sh
 ```
@@ -180,7 +186,7 @@ Get dependencies:
 xcode-select --install
 
 /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-brew install cmake autoconf libtool automake coreutils pkgconfig gmp wget
+brew install cmake autoconf libtool automake libevent coreutils pkgconfig gmp wget
 
 brew install gcc5 --without-multilib
 ```

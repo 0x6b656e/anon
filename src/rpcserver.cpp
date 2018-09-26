@@ -277,21 +277,24 @@ static const CRPCCommand vRPCCommands[] =
         {"network", "clearbanned", &clearbanned, true},
 
         /* Block chain and UTXO */
-        {"blockchain", "getblockchaininfo", &getblockchaininfo, true},
-        {"blockchain", "getbestblockhash", &getbestblockhash, true},
-        {"blockchain", "getblockcount", &getblockcount, true},
-        {"blockchain", "getblock", &getblock, true},
-        {"blockchain", "getblockhash", &getblockhash, true},
-        {"blockchain", "getblockheader", &getblockheader, true},
-        {"blockchain", "getchaintips", &getchaintips, true},
-        {"blockchain", "getdifficulty", &getdifficulty, true},
-        {"blockchain", "getmempoolinfo", &getmempoolinfo, true},
-        {"blockchain", "getrawmempool", &getrawmempool, true},
-        {"blockchain", "gettxout", &gettxout, true},
-        {"blockchain", "gettxoutproof", &gettxoutproof, true},
-        {"blockchain", "verifytxoutproof", &verifytxoutproof, true},
-        {"blockchain", "gettxoutsetinfo", &gettxoutsetinfo, true},
-        {"blockchain", "verifychain", &verifychain, true},
+        { "blockchain", "getblockchaininfo", &getblockchaininfo, true  },
+        { "blockchain", "getbestblockhash", &getbestblockhash, true  },
+        { "blockchain", "getblockcount",  &getblockcount,  true  },
+        { "blockchain", "getblock",       &getblock,       true  },
+        { "blockchain", "getblockdeltas", &getblockdeltas, false },
+        { "blockchain", "getblockhashes", &getblockhashes, true  },
+        { "blockchain", "getblockhash",   &getblockhash,   true  },
+        { "blockchain", "getblockheader", &getblockheader, true  },
+        { "blockchain", "getchaintips",   &getchaintips,   true  },
+        { "blockchain", "getdifficulty",  &getdifficulty,  true  },
+        { "blockchain", "getmempoolinfo", &getmempoolinfo, true  },
+        { "blockchain", "getrawmempool",  &getrawmempool,  true  },
+        { "blockchain", "gettxout",       &gettxout,       true  },
+        { "blockchain", "gettxoutproof",  &gettxoutproof,  true  },
+        { "blockchain", "verifytxoutproof", &verifytxoutproof, true  },
+        { "blockchain", "gettxoutsetinfo",  &gettxoutsetinfo,  true  },
+        { "blockchain", "verifychain",    &verifychain,    true  },
+        { "blockchain", "getspentinfo",   &getspentinfo,   false },     
 
         /* Mining */
         {"mining", "getblocktemplate", &getblocktemplate, true},
@@ -321,6 +324,13 @@ static const CRPCCommand vRPCCommands[] =
         {"rawtransactions", "fundrawtransaction", &fundrawtransaction, false},
 #endif
 
+        /* Address index */
+        { "addressindex",       "getaddressmempool",      &getaddressmempool,      true  },
+        { "addressindex",       "getaddressutxos",        &getaddressutxos,        false },
+        { "addressindex",       "getaddressdeltas",       &getaddressdeltas,       false },
+        { "addressindex",       "getaddresstxids",        &getaddresstxids,        false },
+        { "addressindex",       "getaddressbalance",      &getaddressbalance,      false },
+
         /* Utility functions */
         {"util", "createmultisig", &createmultisig, true},
         {"util", "validateaddress", &validateaddress, true}, /* uses wallet if enabled */
@@ -338,13 +348,15 @@ static const CRPCCommand vRPCCommands[] =
 #endif
 
         /* Dash features */
+        {"dash", "listmasternodes", &listmasternodes, true},
+        {"dash", "listmasternodeconf", &listmasternodeconf, true},
         {"dash", "masternode", &masternode, true},
         {"dash", "masternodelist", &masternodelist, true},
         {"dash", "masternodebroadcast", &masternodebroadcast, true},
         {"dash", "gobject", &gobject, true},
         {"dash", "mnsync", &mnsync, true},
-        { "dash",               "getgovernanceinfo",      &getgovernanceinfo,      true  },
-        { "dash",               "voteraw",                &voteraw,                true  },
+        {"dash", "getgovernanceinfo", &getgovernanceinfo, true},
+        {"dash", "voteraw", &voteraw, true},
         // {"dash", "getpoolinfo", &getpoolinfo, true},
 
 #ifdef ENABLE_WALLET
